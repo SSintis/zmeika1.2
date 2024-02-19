@@ -5,16 +5,21 @@ using namespace std;
 
 VOID ErrorExit(LPCSTR);
 
+/*game polygon congig
+	x_max - weight settings
+	y_max - height settings
+*/
 const int x_max = 100;
 const int y_max = 25;
 const int max_len = y_max * x_max;
 
+//cursor
 void gotoxy(int x, int y) {
 	COORD pos = { x, y };
 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(output, pos);
 }
-
+//Class game pokygon
 class Field {
 public:
 	int PositionAppleX;
