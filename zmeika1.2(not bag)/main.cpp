@@ -151,7 +151,7 @@ bool Snake::CheckGameOver() {
 
 int main(VOID) {
 	Field fi;
-	Snake snake(1, 1);
+	Snake snake(1, 1); //create cnake class
 
 	fi.CreateBorder(219);
 	snake.ToStarGame(fi);
