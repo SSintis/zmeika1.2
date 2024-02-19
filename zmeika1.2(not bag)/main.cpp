@@ -98,8 +98,6 @@ void Snake::ToStarGame(Field& field) {
 	field.field[PositionSnakeY[0]][PositionSnakeX[0]] = sChar;
 }
 
-//char field[y_max][x_max + 1]
-
 void Snake::Move(Field& field) {
 	for (int i = 0; i < Snake_Length; ++i) {
 		field.field[PositionSnakeY[i]][PositionSnakeX[i]] = ' ';
@@ -159,7 +157,6 @@ int main(VOID) {
 	snake.ToStarGame(fi);
 	fi.AppleOnField = false;
 	fi.GenerateApple();
-	//snake.AddTail();
 
 	HANDLE hStdin;
 	const short bufferSize = 128;
@@ -190,7 +187,6 @@ int main(VOID) {
 		}
 
 		eventCount += cNumRead;
-		//printf("iteration %d total %d current %d\n", index, eventCount, cNumRead);
 
 		for (DWORD i = 0; i < cNumRead; ++i) {
 			if (irInBuf[i].EventType == KEY_EVENT) {
