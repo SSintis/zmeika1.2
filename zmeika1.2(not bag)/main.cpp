@@ -45,9 +45,16 @@ private:
 	char sChar = -2;								//sChar - поле которая хранит символ из которого состоит змейка
 	int Snake_Length;								//Размер змейки
 public:
-	Snake(int rotation, int lenght) {				//Конструктор класса snake
+	Snake(int rotation, int lenght) {				//Конструктор класса snake для случаев когда нужно не стандартное начало
 		this->Rotation = rotation;					//Выставляем изначальный вектор перемещения
 		this->Snake_Length = lenght;				//Выставляем изначальную длину змейки
+
+		this->PositionSnakeX[0] = x_max / 2;		//Ставим изначальные координаты змейки относительно оси ОХ
+		this->PositionSnakeY[0] = y_max / 2;		//Ставим изначальные координаты змейки относительно оси ОY
+	}
+	Snake() {										//Стандартный конструктор
+		this->Rotation = 1;							//Выставляем изначальный вектор перемещения
+		this->Snake_Length = 1;						//Выставляем изначальную длину змейки
 
 		this->PositionSnakeX[0] = x_max / 2;		//Ставим изначальные координаты змейки относительно оси ОХ
 		this->PositionSnakeY[0] = y_max / 2;		//Ставим изначальные координаты змейки относительно оси ОY
@@ -185,13 +192,18 @@ bool Snake::CheckGameOver() {
 }
 
 int main(VOID) {
-	Field fi;
-	Snake snake(1, 1); //create cnake class
-
-	fi.CreateBorder(219);
-	snake.ToStarGame(fi);
-	fi.AppleOnField = false;
-	fi.GenerateApple();
+	Field fi;										//Объявлеям объект игрового поля
+	Snake snake;									//Объявляем объект змеи со стандартными значениями
+													//int rotation = 1;
+													//int lenght = 1;
+													
+													//Так же можно вызвать через 
+													//Snake snake(int rotation, int lenght);
+	//Небольшая настройка игрового поля
+	fi.CreateBorder(219);							//Создание границ игрового поля (вместо '219', можно вписать любой другой символ)
+	snake.ToStarGame(fi);							//Начальная отрисовка змейки
+	fi.AppleOnField = false;						//Яблок нету на игровом поле
+	fi.GenerateApple();								//создание первого яблока
 
 	HANDLE hStdin;
 	const short bufferSize = 128;
@@ -247,9 +259,6 @@ int main(VOID) {
 							snake.SetRotation(4);
 						}
 					}
-				}
-				else {
-					//printf("Key Realesed\n");
 				}
 			}
 		}
