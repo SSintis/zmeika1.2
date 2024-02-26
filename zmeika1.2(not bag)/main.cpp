@@ -1,17 +1,13 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <windows.h>
 using namespace std;
 
 VOID ErrorExit(LPCSTR);
 
-/*game polygon congig
-	x_max - weight settings
-	y_max - height settings
-*/
-const int x_max = 100;
-const int y_max = 25;
-const int max_len = y_max * x_max;
+const int x_max = 100;								//Длина игрового поля
+const int y_max = 25;								//Высота игрового поля
+const int max_len = y_max * x_max;					//Количество "клеточек" в игровом поле
 
 //cursor
 void gotoxy(int x, int y) {
@@ -22,66 +18,71 @@ void gotoxy(int x, int y) {
 //Class game pokygon
 class Field {
 public:
-	int PositionAppleX;
-	int PositionAppleY;
-	char CharApple = '+';
-	bool AppleOnField;
+	int PositionAppleX;								//Позиция яблока по оси ОХ
+	int PositionAppleY;								//Позиция яблока по оси OY
+	char CharApple = '+';							//Иконка яблока
+	bool AppleOnField;								//Булевая перременная в которая показывает, имеется ли яблоко на поле
 
-	char field[y_max][x_max+1];
-	void CreateBorder(char ch);
-	void Show();
-	void GenerateApple();
+	char field[y_max][x_max+1];						//Двумерный массив и по совместительству игровое поле с размерами y_max и x_max
+
+	//Все функции будут описаны ниже по коду
+	void CreateBorder(char ch);						//Функция для создание границ игрового поля. 
+													//char ch - Это определеный символ из которого будут состоять границы
+	void Show();									//Функция для отрисовки всего поля
+	void GenerateApple();							//Функция для генерации яблока
 };
-
+//Class game person. Snake
 class Snake {
 private:
-	int PositionSnakeX[max_len];
-	int PositionSnakeY[max_len];
+	int PositionSnakeX[max_len];					//Массив позиций каждого элемента змейки по оси ОХ
+	int PositionSnakeY[max_len];					//Массив позиций каждого элемента змейки по оси О
 
-	int Rotation;// 1 - UP; 2 - DOWN; 3 - LEFT; 4 - RIGHT
-	char sChar = -2;
+	int Rotation;									//Rotation - переменная показывающая вектор перемещания змейки
+													//
+													//      1 - UP; 2 - DOWN; 3 - LEFT; 4 - RIGHT
+													//
 
-	int Snake_Length;
+	char sChar = -2;								//sChar - переменная которая хранит символ из которого состоит змейка
+	int Snake_Length;								//Размер змейки
 public:
-	Snake(int rotation, int lenght) {
-		this->Rotation = rotation;
-		this->Snake_Length = lenght;
+	Snake(int rotation, int lenght) {				//Конструктор класса snake
+		this->Rotation = rotation;					//Выставляем изначальный вектор перемещения
+		this->Snake_Length = lenght;				//Выставляем изначальную длину змейки
 
-		this->PositionSnakeX[0] = x_max / 2;
-		this->PositionSnakeY[0] = y_max / 2;
+		this->PositionSnakeX[0] = x_max / 2;		//Ставим изначальные координаты змейки относительно оси ОХ
+		this->PositionSnakeY[0] = y_max / 2;		//Ставим изначальные координаты змейки относительно оси ОY
 	}
 
-	void SetRotation(int rot) {
-		this->Rotation = rot;
-	}
+	void SetRotation(int rot) { this->Rotation = rot; }				//Функция для изменения вектора перемещения змейки
 
-	void ToStarGame(Field& field);
-	void Move(Field& field);
-	void AddTail();
-	bool CheckGameOver();
+	void ToStarGame(Field& field);					//Функция для начала отрисовки змейки
+	void Move(Field& field);						//Логика перемещения змейки по игровому полю
+	void AddTail();									//Функция для увеличения размера змейки
+	bool CheckGameOver();							//Проверка столкновения змейки с препядствиями
 
-	int Get_rotation() {
-		return Rotation;
-	}
+	int Get_rotation() { return Rotation; }			//Гетер для возвращения приватной переменной Rotation
 };
-
-void Field::CreateBorder(char ch) {
-	for (int i = 0; i < y_max; ++i) {
-		for (int j = 0; j < x_max; ++j) {
-			if (i == 0 || i == y_max - 1 ||
-				j == 0 || j == x_max-1) {
-				field[i][j] = ch;
+//Функция для создания границ игрового поля
+void Field::CreateBorder(char ch) {					//ch - может принимать любой знак, но по стандарту моей змейки это - 219
+	for (int i = 0; i < y_max; ++i) {				//Создаем массив для оси OY
+		for (int j = 0; j < x_max; ++j) {			//Создаем массив для оси OX
+			//Проверка координат
+			if (i == 0 || i == y_max - 1 ||			//Если координата совпадает с верхней границей или нижней, то отрисовываем знак границы	
+				j == 0 || j == x_max-1) {			//Если координата совпадает с правой или левой границей, то отрисовываем знак границы
+				field[i][j] = ch;					//Отрисовка знака
 			}
 			else {
-				field[i][j] = ' ';
+				field[i][j] = ' ';					//Если координата не совпадает с концами границ, то отрисовываем пустое значение. Игровое поле
 			}
 		}
-		field[i][y_max] = '\0';
+		field[i][y_max] = '\0';						//Добавляем в конец каждой строки знак конца строки
 	}
 }
-
+//Функция отрисовки игрового поля
 void Field::Show() {
-	gotoxy(0, 0);
+	gotoxy(0, 0);									//Курсор который ставит все поле в начале консоли
+
+	//Обычный цикл по всм элементам поля и последующий вывод их на экран
 	for (int i = 0; i < y_max; ++i) {
 		for (int j = 0; j < x_max; ++j) {
 			cout << field[i][j];
@@ -89,51 +90,77 @@ void Field::Show() {
 		cout << endl;
 	}
 }
-
+//Функция для создания яблок
 void Field::GenerateApple() {
-	if (!AppleOnField) {
-		AppleOnField = true;
-		PositionAppleX = rand() % (x_max - 2);
-		PositionAppleY = 1 + rand() % (y_max - 2);
-		field[PositionAppleY][PositionAppleX] = CharApple;
+	if (!AppleOnField) {							//Проверка. Имеется ли яблоко?
+													//Если имеется, то выполняется кусок кода
+		AppleOnField = true;						//Ставим значение AppleOnField в true, так как мы сейчас создадим яблоко
+		int PosOX = rand() % (x_max - 2);			//Псевдо-рандомная позиция яблока по оси OX
+		int PosOY = 1 + rand() % (x_max - 2);		//Псевдо - рандомная позиция яблока по оси OY
+
+		if (field[PosOY][PosOX] == ' ') {			//Проврка, если координаты являются пусятыми, то создаем яблоко
+			PositionAppleX = PosOX;		
+			PositionAppleY = PosOY;	
+			field[PositionAppleY][PositionAppleX] = CharApple;				//Отрисовываем значок яблока
+		}
 	}
 }
-
+//Отрисовка начального положения змейки
 void Snake::ToStarGame(Field& field) {
 	field.field[PositionSnakeY[0]][PositionSnakeX[0]] = sChar;
 }
-
+//Логика перемещения змейки по игровому полю
 void Snake::Move(Field& field) {
+	//Цикл для очистки змейки с игрового поля
 	for (int i = 0; i < Snake_Length; ++i) {
 		field.field[PositionSnakeY[i]][PositionSnakeX[i]] = ' ';
 	}
 
 	for (int i = Snake_Length; i>0; --i) {
-		PositionSnakeX[i] = PositionSnakeX[i - 1];
-		PositionSnakeY[i] = PositionSnakeY[i - 1];
+		PositionSnakeX[i] = PositionSnakeX[i - 1];	//Присваиваем координаты оси OX предыдущей змеки, нынешней
+		PositionSnakeY[i] = PositionSnakeY[i - 1];	//Присваиваем координаты оси OY предыдущей змеки, нынешней
 	}
-
+	//Блок изменения координат в зависимости от вектора перемешения змейки
 	if (this->Rotation == 1) {
-		this->PositionSnakeY[0]--;
+		this->PositionSnakeY[0]--;					//Если вектор = 1, то мы передвигаем значение головы змейки на одну единицу вверх
 	}
 	else if (this->Rotation == 2) {
-		this->PositionSnakeY[0]++;
+		this->PositionSnakeY[0]++;					//Если вектор = 2, то мы передвигае значение головы змейки на одну единицу вниз
 	}
 	else if (this->Rotation == 3) {
-		this->PositionSnakeX[0]--;
+		this->PositionSnakeX[0]--;					//Если вектор = 3, то мы передвигаем голову змейки на одну еденицу влево
 	}
 	else if (this->Rotation == 4) {
-		this->PositionSnakeX[0]++;
+		this->PositionSnakeX[0]++;					//Если вектор = 4, то мы передвигаем голову змейки на одну единицу вправо
 	}
 
-	if (PositionSnakeX[0] == field.PositionAppleX && PositionSnakeY[0] == field.PositionAppleY) {
-		field.AppleOnField = false;
-		this->AddTail();
-		field.GenerateApple();
+	/*Следует отметить, что в ире система координат оси OY - перевернута
+	  Поэтому когда мы перемещаем голову вверх, мы вычитаем координату, а не прибавляем
+	  0---------------------------------------------->OX
+	  |
+	  |
+	  |
+	  |
+	  |
+	  |						  0
+	  |
+	  |
+	  |
+	  |
+	  |
+	  ↓
+	  OY
+	  */
+
+	if (PositionSnakeX[0] == field.PositionAppleX	//Проверка взимодействия головы змеи с яблоком, если они одинаковы, то выполняется следующий код
+		&& PositionSnakeY[0] == field.PositionAppleY) {
+		field.AppleOnField = false;					//Ставим значение AppleOnField на false, так как мы его считай съели
+		this->AddTail();							//Добавляем размер змейки + 1
+		field.GenerateApple();						//Создаём еще одно яблоко
 	}
 
 	for (int i = 0; i < Snake_Length; ++i) {
-		field.field[PositionSnakeY[i]][PositionSnakeX[i]] = sChar;
+		field.field[PositionSnakeY[i]][PositionSnakeX[i]] = sChar;		//Отрисовка всей змеи
 	}
 }
 
