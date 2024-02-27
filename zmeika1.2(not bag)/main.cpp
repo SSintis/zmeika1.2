@@ -199,35 +199,40 @@ int main(VOID) {
 													
 													//Так же можно вызвать через 
 													//Snake snake(int rotation, int lenght);
+													
 	//Небольшая настройка игрового поля
 	fi.CreateBorder(219);							//Создание границ игрового поля (вместо '219', можно вписать любой другой символ)
 	snake.ToStarGame(fi);							//Начальная отрисовка змейки
 	fi.AppleOnField = false;						//Яблок нету на игровом поле
 	fi.GenerateApple();								//создание первого яблока
 
-	HANDLE hStdin;
-	const short bufferSize = 128;
-	INPUT_RECORD irInBuf[bufferSize];
+	HANDLE hStdin;									//Создание дескриптора hStdin
+	const short bufferSize = 128;					//Создание размера буффера
+	INPUT_RECORD irInBuf[bufferSize];				//Описывает входные события буффера данных с консоли
 
-	hStdin = GetStdHandle(STD_INPUT_HANDLE);
-	if (hStdin == INVALID_HANDLE_VALUE) {
-		ErrorExit("GetStdHandle");
+	hStdin = GetStdHandle(STD_INPUT_HANDLE);		//Извлекает дискриптор для стандртного устройства
+													//STD_INPUT_HANDLE - стандартное устройство ввода
+													
+	//Если возвращаемое значение составило INVALID_HANDLE_VALUE, то значит функция GetStdHandle, выполнилась некоректно
+	if (hStdin == INVALID_HANDLE_VALUE) {			//Проверка на коректность выполнения функции GetStdHandle
+		ErrorExit("GetStdHandle");					//Закрываем программу с ошибкой указывающая на этот кусок кода
 	}
-
+	//Объявление двух нужных переменных для коректной работы игры
 	int index = 0;
 	int eventCount = 0;
 
-	while (index < 1000000) {
-		DWORD cNumRead = 0;
-		BOOL peekSuccesful = PeekConsoleInput(
-			hStdin,
-			irInBuf,
-			bufferSize,
-			&cNumRead
+	while (index < 1000000) {						//Почти бесконечныый цикл в котором будет происходить сама игра
+		DWORD cNumRead = 0;							//Переменная которая считает количество прочитанных данных
+		BOOL peekSuccesful = PeekConsoleInput(		//PeekConsoleInput - считывает данные из указанного входного буфера консоли, не удаляя их из буфера
+			hStdin,									//Дескриптор
+			irInBuf,								//Буффер
+			bufferSize,								//Размер буффера
+			&cNumRead								//количество прочитанных данных
 		);
 
-		if (!peekSuccesful) {
-			ErrorExit("PeekConsoleInput");
+		if (!peekSuccesful) {						//У PeekConsoleInput возвращемое значение при коректной работе будет не нулевое значепние
+													//А если выдётся нулевое, то значит имеется ошибка
+			ErrorExit("PeekConsoleInput");			//Закрываем программу указывая на место ошибки
 		}
 		if (!FlushConsoleInputBuffer(hStdin)) {
 			ErrorExit("FlushConsoleInputBuffer");
