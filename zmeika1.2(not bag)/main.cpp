@@ -234,44 +234,53 @@ int main(VOID) {
 													//А если выдётся нулевое, то значит имеется ошибка
 			ErrorExit("PeekConsoleInput");			//Закрываем программу указывая на место ошибки
 		}
-		if (!FlushConsoleInputBuffer(hStdin)) {
-			ErrorExit("FlushConsoleInputBuffer");
+		if (!FlushConsoleInputBuffer(hStdin)) {		//FlushConsoleInputBuffer - Очищает входной буфер консоли. При неудачной попытке возвращает нулевое значение
+			ErrorExit("FlushConsoleInputBuffer");	//Закрываем программу указывая на место ошибки
 		}
 
 		eventCount += cNumRead;
 
-		for (DWORD i = 0; i < cNumRead; ++i) {
-			if (irInBuf[i].EventType == KEY_EVENT) {
-				KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;
-				if (ker.bKeyDown) {
-					if (ker.wVirtualKeyCode == 87) {
-						if (snake.Get_rotation() != 2) {
-							snake.SetRotation(1);
+		for (DWORD i = 0; i < cNumRead; ++i) {		//Цикл в котором идёт проверка нажатия клавиши
+			if (irInBuf[i].EventType == KEY_EVENT) {					//Если тип ивента irInBuf это KEY_EVENT, то значит клавиша была нажата
+				KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;		//Создаём переменую ker в которую записываем данные о нажатой клавише
+				if (ker.bKeyDown) {										//Если ker.bKeyDown == 1, то значит что клавиша нажата
+
+					//ker.wVirtualKeyCode = 87 - 'W'
+					//ker.wVirtualKeyCode = 83 - 'S'
+					//ker.wVirtualKeyCode = 65 - 'A'
+					//ker.wVirtualKeyCode = 68 - 'D'
+
+					if (ker.wVirtualKeyCode == 87) {					//ker.wVirtualKeyCode - хранит код нахатой клавиши
+																		//ker.wVirtualKeyCode == 87, значит нажата клавиша 'W'
+						if (snake.Get_rotation() != 2) {				//Проверяем имеюшься у змейки вектор направления, 
+																		//если он противоположен вектору который мы хотим задать
+																		//То код не отработает
+							snake.SetRotation(1);						//Устанавливаем нужный нам вектор направления
 						}
 					}
-					else if (ker.wVirtualKeyCode == 83) {
-						if (snake.Get_rotation() != 1) {
-							snake.SetRotation(2);
+					else if (ker.wVirtualKeyCode == 83) {				//ker.wVirtualKeyCode == 87, значит нажата клавиша 'S'
+						if (snake.Get_rotation() != 1) {				//Проверяем имеюшься у змейки вектор направления
+							snake.SetRotation(2);						//Устанавливаем нужное нам значение
 						}
 					}
-					else if (ker.wVirtualKeyCode == 65) {
-						if (snake.Get_rotation() != 4) {
-							snake.SetRotation(3);
+					else if (ker.wVirtualKeyCode == 65) {				//ker.wVirtualKeyCode == 87, значит нажата клавиша 'A'
+						if (snake.Get_rotation() != 4) {				//Проверяем имеюшься у змейки вектор направления
+							snake.SetRotation(3);						//Устанавливаем нужное нам значение
 						}
 					}
-					else if (ker.wVirtualKeyCode == 68) {
-						if (snake.Get_rotation() != 3) {
-							snake.SetRotation(4);
+					else if (ker.wVirtualKeyCode == 68) {				//ker.wVirtualKeyCode == 87, значит нажата клавиша 'D'
+						if (snake.Get_rotation() != 3) {				//Проверяем имеюшься у змейки вектор направления
+							snake.SetRotation(4);						//Устанавливаем нужное нам значение
 						}
 					}
 				}
 			}
 		}
-		snake.Move(fi);
-		fi.Show();
-		Sleep(85);
+		snake.Move(fi);							//Используем метод snake.Move в которого передаём игровое поле, для того что бы змейка передвигалась
+		fi.Show();								//Отрисовываем игровое поле
+		Sleep(85);								//Задержка для игры (Скорость змейки, чем больше тут значение тем медленее она)
 
-		if (snake.CheckGameOver()) break;
+		if (snake.CheckGameOver()) break;		//Проверка на конец игры, исла да, то выход из игры
 
 		index++;
 	}
